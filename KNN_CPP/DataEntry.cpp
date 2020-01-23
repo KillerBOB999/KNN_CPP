@@ -24,3 +24,13 @@ const int& DataEntry::getClassification()
 {
 	return classification;
 }
+
+double DataEntry::calcDistance(DataEntry& other)
+{
+	double sum = 0;
+	for (int attributeIndex = 0; attributeIndex < getData().size(); ++attributeIndex)
+	{
+		sum += (pow(getData()[attributeIndex] - other.getData()[attributeIndex], 2));
+	}
+	return sqrt(sum);
+}

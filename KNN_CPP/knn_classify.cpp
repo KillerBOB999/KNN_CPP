@@ -1,7 +1,7 @@
 // INFORMATION--------------------------------------------------------------------------
 // DEVELOPER:        Anthony Harris
 // GITHUB:           https://github.com/KillerBOB999/KNN_CPP
-// DATE:             21 January 2019
+// DATE:             23 January 2019
 // PURPOSE:          KNN algorithm implementation in C++ for CSC736: Machine Learning.
 //--------------------------------------------------------------------------------------
 
@@ -21,14 +21,9 @@ using std::vector;
 using std::string;
 using std::tuple;
 
-double calcDistance(DataEntry entry1, DataEntry entry2)
+void findNeighbors(vector<DataEntry>& dataSet, const int& k)
 {
-    double sum = 0;
-    for (int attributeIndex = 0; attributeIndex < entry1.getData().size(); ++attributeIndex)
-    {
-        sum += (pow(entry1.getData()[attributeIndex] - entry2.getData()[attributeIndex], 2));
-    }
-    return sqrt(sum);
+
 }
 
 vector<double> calcSTD(vector<DataEntry>& dataSet, const vector<double>& means)
@@ -113,5 +108,7 @@ int main(int argc, char* argv[]) // invoked by: knn_classify pendigits_training 
     standardizeData(trainingData);
     standardizeData(testData);
     
+    findNeighbors(trainingData, k);
+
     return 0;
 }
