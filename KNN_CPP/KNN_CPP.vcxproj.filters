@@ -18,5 +18,21 @@
     <ClCompile Include="knn_classify.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DataEntry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="pendigits_test.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+    <Text Include="pendigits_training.txt">
+      <Filter>Resource Files</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DataEntry.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

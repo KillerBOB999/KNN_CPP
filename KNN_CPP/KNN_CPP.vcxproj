@@ -147,7 +147,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DataEntry.cpp" />
     <ClCompile Include="knn_classify.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="pendigits_test.txt" />
+    <Text Include="pendigits_training.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="DataEntry.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
