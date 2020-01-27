@@ -1,7 +1,7 @@
 // INFORMATION--------------------------------------------------------------------------
 // DEVELOPER:        Anthony Harris
 // GITHUB:           https://github.com/KillerBOB999/KNN_CPP
-// DATE:             23 January 2019
+// DATE:             27 January 2019
 // PURPOSE:          KNN algorithm implementation in C++ for CSC736: Machine Learning.
 //--------------------------------------------------------------------------------------
 
@@ -12,6 +12,7 @@
 #include <math.h>
 #include <vector>
 #include <string>
+#include <thread>
 #include "DataEntry.h"
 
 using std::cin;
@@ -20,10 +21,77 @@ using std::ifstream;
 using std::vector;
 using std::string;
 using std::tuple;
+using std::make_pair;
 
-void findNeighbors(vector<DataEntry>& dataSet, const int& k)
+int findClassVote(const map<int, double>& neighbors, vector<DataEntry>& trainingDataSet)
 {
+    map<int, double> classVote =
+    {
+        { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 }, { 6, 0 }, { 7, 0 }, { 8, 0 }, { 9, 0 }
+    };
 
+    for (auto& neighbor : neighbors)
+    {
+        for (auto& classLabel : classVote)
+        {
+            if (trainingDataSet[neighbor.first].getClassification() == classLabel.first)
+            {
+                classLabel.second += 1 / neighbor.second;
+            }
+        }
+    }
+
+    auto finalVote = make_pair(-1, 0.0);
+    for (auto& vote : classVote)
+    {
+        if (vote.second > finalVote.second) finalVote = vote;
+    }
+
+    return finalVote.first;
+}
+
+map<int, double> findNeighbors(DataEntry& entry, vector<DataEntry>& trainingDataSet, const int& k)
+{
+    map<int, double> neighbors;
+
+    for (int entryIndex = 0; entryIndex < trainingDataSet.size(); ++entryIndex)
+    {
+        if (neighbors.size() < k) neighbors.insert(make_pair(entryIndex, entry.calcDistance(trainingDataSet[entryIndex])));
+        else
+        {
+            double currentDistance = entry.calcDistance(trainingDataSet[entryIndex]);
+            auto currentFarthestNeighbor = make_pair(-1, 0.0);
+            for (auto& neighbor : neighbors)
+            {
+                if (neighbor.second > currentFarthestNeighbor.second)
+                {
+                    currentFarthestNeighbor = neighbor;
+                }
+            }
+            if (currentDistance < currentFarthestNeighbor.second)
+            {
+                neighbors.erase(currentFarthestNeighbor.first);
+                neighbors.insert(make_pair(entryIndex, currentDistance));
+            }
+        }
+    }
+    return neighbors;
+}
+
+void runKNN(vector<DataEntry>& trainingDataSet, vector<DataEntry>& testDataSet, const int& k)
+{
+    double correct = 0;
+    double incorrect = 0;
+    int ID = 0;
+    for (auto& entry : testDataSet)
+    {
+        map<int, double> neighbors = findNeighbors(entry, trainingDataSet, k);
+        int classPrediction = findClassVote(neighbors, trainingDataSet);
+        classPrediction == entry.getClassification() ? ++correct : ++incorrect;
+        printf("ID=%5d, predicted=%3d, true=%3d\n", ID, classPrediction, entry.getClassification());
+        ++ID;
+    }
+    printf("classification accuracy=%6.4lf\n", correct / (correct + incorrect));
 }
 
 vector<double> calcSTD(vector<DataEntry>& dataSet, const vector<double>& means)
@@ -103,12 +171,12 @@ int main(int argc, char* argv[]) // invoked by: knn_classify pendigits_training 
 {
     vector<DataEntry> trainingData = collectData(argv[1]);
     vector<DataEntry> testData = collectData(argv[2]);
-    const int k = (int)argv[3];
+    const int k = atoi(argv[3]);
 
     standardizeData(trainingData);
     standardizeData(testData);
     
-    findNeighbors(trainingData, k);
+    runKNN(trainingData, testData, k);
 
     return 0;
 }

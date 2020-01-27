@@ -10,7 +10,6 @@ class DataEntry
 private:
 	vector<double> data;
 	int classification;
-	map<DataEntry, double> neighbors;
 
 public:
 	DataEntry();
@@ -21,6 +20,5 @@ public:
 	const int& getClassification();
 
 	double calcDistance(DataEntry& other);
-	void updateNeighbors(const int& k, const DataEntry& possibleNeighbor);
 };
 
