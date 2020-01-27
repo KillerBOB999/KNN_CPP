@@ -1,18 +1,15 @@
 // INFORMATION--------------------------------------------------------------------------
 // DEVELOPER:        Anthony Harris
 // GITHUB:           https://github.com/KillerBOB999/KNN_CPP
-// DATE:             27 January 2019
+// DATE:             27 January 2020
 // PURPOSE:          KNN algorithm implementation in C++ for CSC736: Machine Learning.
 //--------------------------------------------------------------------------------------
-
-// \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
 
 #include <iostream>
 #include <fstream>
 #include <math.h>
 #include <vector>
 #include <string>
-#include <thread>
 #include "DataEntry.h"
 
 using std::cin;
@@ -23,7 +20,7 @@ using std::string;
 using std::tuple;
 using std::make_pair;
 
-int findClassVote(const map<int, double>& neighbors, vector<DataEntry>& trainingDataSet)
+vector<int> findClassVote(const map<int, double>& neighbors, vector<DataEntry>& trainingDataSet)
 {
     map<int, double> classVote =
     {
@@ -42,12 +39,17 @@ int findClassVote(const map<int, double>& neighbors, vector<DataEntry>& training
     }
 
     auto finalVote = make_pair(-1, 0.0);
+    int numSame = 0;
     for (auto& vote : classVote)
     {
         if (vote.second > finalVote.second) finalVote = vote;
     }
+    for (auto& vote : classVote)
+    {
+        if (finalVote.second == vote.second) ++numSame;
+    }
 
-    return finalVote.first;
+    return vector<int>{finalVote.first, numSame};
 }
 
 map<int, double> findNeighbors(DataEntry& entry, vector<DataEntry>& trainingDataSet, const int& k)
@@ -80,18 +82,22 @@ map<int, double> findNeighbors(DataEntry& entry, vector<DataEntry>& trainingData
 
 void runKNN(vector<DataEntry>& trainingDataSet, vector<DataEntry>& testDataSet, const int& k)
 {
-    double correct = 0;
-    double incorrect = 0;
+    double accuracy = 0;
+    double sum = 0;
     int ID = 0;
     for (auto& entry : testDataSet)
     {
         map<int, double> neighbors = findNeighbors(entry, trainingDataSet, k);
-        int classPrediction = findClassVote(neighbors, trainingDataSet);
-        classPrediction == entry.getClassification() ? ++correct : ++incorrect;
-        printf("ID=%5d, predicted=%3d, true=%3d\n", ID, classPrediction, entry.getClassification());
+        const vector<int> classPrediction = findClassVote(neighbors, trainingDataSet);
+
+        accuracy = (double)(classPrediction[0] == entry.getClassification()) / classPrediction[1];
+
+        printf("ID=%5d, predicted=%3d, true=%3d, accuracy=%.2f\n", ID, classPrediction[0], entry.getClassification(), accuracy);
+
+        sum += accuracy;
         ++ID;
     }
-    printf("classification accuracy=%6.4lf\n", correct / (correct + incorrect));
+    printf("classification accuracy=%6.4lf\n", sum / (ID + 1.0));
 }
 
 vector<double> calcSTD(vector<DataEntry>& dataSet, const vector<double>& means)
